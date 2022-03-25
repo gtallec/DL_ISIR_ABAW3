@@ -5,10 +5,4 @@ DATA_PROCESSING_REQUIRED_PARAMS = {"rotation": ["rotation_factor"],
                                    "brightness": ["brightness_factor"],
                                    "mixup": ["beta_mixup", "ignore_mixup"],
                                    "label_smoothing": ["alpha_smooth"],
-                                   "pl_label_smoothing": ["alpha_smooth"],
-                                   "m_rotation": ["rotation_factor"],
-                                   "m_zoom": ["zoom_factor"],
-                                   "m_contrast": ["contrast_factor"],
-                                   "m_channel_drop": ["p_channel"],
-                                   "m_brightness": ["brightness_factor"],
-                                   "m_label_smoothing": ["alpha_smooth"]}
+                                   "pl_label_smoothing": ["alpha_smooth"]}
