@@ -3,30 +3,17 @@ import measures
 import tensorflow as tf
 
 from metrics_extended.abstract_metrics import SlidingMeanMetric
-from measures_extended.reweighted_measures import weighted_bce, uncertainty_weighted_bce
+from measures_extended.reweighted_measures import weighted_bce
 from measures_extended.partial_labels_measures import partial_labels_bce, partial_labels_dice, partial_labels_weighted_bce, partial_labels_weighted_dice
 
-
-class BTMCCE(SlidingMeanMetric):
-    def __init__(self, **kwargs):
-        (super(BTMCCE, self)
-         .__init__(name="BTMCCE",
-                   eval_function=measures.btm_cce(**kwargs)))
-
-class BinaryCrossentropy(SlidingMeanMetric):
+class BCE(SlidingMeanMetric):
     def __init__(self, pred_in, name='bce', **kwargs):
-        (super(BinaryCrossentropy, self).__init__(name=name,
-                                                  eval_function=measures.mean_bce(pred_in)))
-
-class MBinaryCrossentropy(SlidingMeanMetric):
-    def __init__(self, pred_in, name='mbce', **kwargs):
-        (super(MBinaryCrossentropy, self).__init__(name=name,
-                                                   eval_function=measures.masked_mean_bce(pred_in)))
-
-class PLBinaryCrossentropy(SlidingMeanMetric):
+        (super(BCE, self).__init__(name=name,
+                                   eval_function=measures.mean_bce(pred_in)))
+class PLBCE(SlidingMeanMetric):
     def __init__(self, pred_in, name='plbce', **kwargs):
-        (super(PLBinaryCrossentropy, self).__init__(name=name,
-                                                    eval_function=partial_labels_bce(pred_in)))
+        (super(PLBCE, self).__init__(name=name,
+                                     eval_function=partial_labels_bce(pred_in)))
 
 class PLDice(SlidingMeanMetric):
     def __init__(self, pred_in, name='pldice', **kwargs):
@@ -56,58 +43,23 @@ class PLFWDice(PLWDice):
                                        weights=weights,
                                        name=name)
 
-class PositiveBCE(SlidingMeanMetric):
-    def __init__(self, **kwargs):
-        (super(PositiveBCE, self)
-         .__init__(name='positive_bce',
-                   eval_function=measures.positivelabels_bce))
-
-class NegativeBCE(SlidingMeanMetric):
-    def __init__(self, **kwargs):
-        (super(NegativeBCE, self)
-         .__init__(name='negative_bce',
-                   eval_function=measures.negativelabels_bce))
-
-class WeightedBinaryCrossentropy(SlidingMeanMetric):
+class WBCE(SlidingMeanMetric):
     def __init__(self, pred_in, weights, name='wbce', **kwargs):
-        super(WeightedBinaryCrossentropy, self).__init__(eval_function=weighted_bce(pred_in=pred_in,
-                                                                                    weights=weights),
-                                                         name=name)
+        super(WBCE, self).__init__(eval_function=weighted_bce(pred_in=pred_in,
+                                                              weights=weights),
+                                   name=name)
 
-class FrequencyWeightedBinaryCrossentropy(WeightedBinaryCrossentropy):
+class FWBCE(WBCE):
     def __init__(self, pred_in, frequencies, name='fwbce', **kwargs):
         weights = tf.dtypes.cast(tf.shape(frequencies)[0], tf.float32) * (1 / frequencies) / tf.math.reduce_sum(1 / frequencies)
-        super(FrequencyWeightedBinaryCrossentropy, self).__init__(pred_in=pred_in,
-                                                                  weights=weights,
-                                                                  name=name)
+        super(FWBCE, self).__init__(pred_in=pred_in,
+                                    weights=weights,
+                                    name=name)
 
 
-class SoftFrequencyWeightedBinaryCrossentropy(WeightedBinaryCrossentropy):
-    def __init__(self, pred_in, frequencies, name='sfwbce', **kwargs):
-        weights = tf.dtypes.cast(tf.shape(frequencies)[0], tf.float32) * (1 - frequencies) / tf.math.reduce_sum(1 - frequencies)
-        super(SoftFrequencyWeightedBinaryCrossentropy, self).__init__(pred_in=pred_in,
-                                                                      weights=weights,
-                                                                      name=name)
-
-class UncertaintyWeightedBinaryCrossentropy(SlidingMeanMetric):
-    def __init__(self, pred_in, weights_in, name='ubce', **kwargs):
-        super(UncertaintyWeightedBinaryCrossentropy, self).__init__(eval_function=uncertainty_weighted_bce(pred_in=pred_in,
-                                                                                                           weights_in=weights_in),
-                                                                    name=name,
-                                                                    **kwargs)
-
-
-SUPPORTED_LOSS_METRICS = {"bce": BinaryCrossentropy,
-                          "mbce": MBinaryCrossentropy,
-                          "plbce": PLBinaryCrossentropy,
+SUPPORTED_LOSS_METRICS = {"bce": BCE,
+                          "plbce": PLBCE,
                           "plfwbce": PLFWBCE,
                           "pldice": PLDice,
                           "plfwdice": PLFWDice,
-                          "ubce": UncertaintyWeightedBinaryCrossentropy,
-                          "sfwbce": SoftFrequencyWeightedBinaryCrossentropy,
-                          "fwbce": FrequencyWeightedBinaryCrossentropy,
-                          "pbce": PositiveBCE,
-                          "nbce": NegativeBCE,
-                          "mse": tf.keras.metrics.MeanSquaredError,
-                          "cce": tf.keras.metrics.CategoricalCrossentropy,
-                          "btm_cce": BTMCCE}
+                          "fwbce": FWBCE}

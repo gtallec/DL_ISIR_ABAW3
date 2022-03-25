@@ -1,9 +1,0 @@
-{"grid":{"shared_dense": [true],
- "num_layers": [2],
- "d_model": [128],
- "num_heads": [4],
- "dff": [128],
- "rate": [0.1],
- "temp_tt": [1.0],
- "temp_tx": [1.0]}}
-

@@ -1,0 +1,161 @@
+{
+    "dataset": {
+        "name": "abaw3_seq",
+        "size": [299, 299, 3]
+    },
+    "dataset_statistics": {"train": ["occurences", "frequencies", "steps_by_epoch"]},
+    "storing": "ECCV_submission/abaw3_seq/ivit_motcat/bce.csv",
+    "data_processing": [
+	    	      {"type": "mixup"},
+	    	      {"type": "horizontal_flip"},
+	    	      {"type": "rotation"},
+	    	      {"type": "zoom"},
+		      {"type": "label_smoothing",
+		       "K": 2},
+    		      {"type": "resize",
+    		       "im_h": 299,
+    		       "im_w": 299}],
+    "train_dataset": {
+        "name": "abaw3_seq",
+	"subsample": 5,
+	"mode": "train"},
+    "eval_dataset": {
+        "name": "abaw3_seq",
+	"subsample": 5,
+	"mode": "valid"},
+    "model": {
+        "main": { 
+	    "type": "hencreg",
+	    "dependencies": ["encoder", "transformer", "decoder"]},
+        "encoder": {
+            "type": "inceptionv3_encoder",
+            "optimizer": "encoder",
+	    "weights": "imagenet"},
+	"transformer": {
+	    "type": "ViT",
+	    "patch_size": 1,
+	    "optimizer": "transformer"},
+    	"decoder": {
+		"type": "motcat",
+		"optimizer": "decoder",
+		"T": 12}},	 
+    "optimizers": {
+	"encoder": {
+            "params": {
+                "type": "adamw"
+            },
+            "schedules": [
+                {
+                    "type": "schedule_lr",
+		    "step_on": "epoch",
+                    "schedule_args": [
+                        {
+                            "type": "exponential"
+                        }
+                    ]
+                },
+                {
+                    "type": "schedule_wd",
+		    "step_on": "epoch",
+                    "schedule_args": [
+                        {
+                            "type": "exponential"
+                        }
+                    ]
+                }
+	    ]
+        },
+        "transformer": {
+            "params": {
+                "type": "adamw"
+            },
+            "schedules": [
+                {
+                    "type": "schedule_lr",
+		    "step_on": "batch",
+                    "schedule_args": [
+                        {
+                            "type": "vit_transformer"
+                        }
+                    ]
+                },
+                {
+                    "type": "schedule_wd",
+		    "step_on": "batch",
+                    "schedule_args": [
+                        {
+                            "type": "vit_transformer"
+                        }
+                    ]
+                }
+	    ]
+        },
+        "decoder": {
+            "params": {
+                "type": "adamw"
+            },
+            "schedules": [
+                {
+                    "type": "schedule_lr",
+		    "step_on": "batch",
+                    "schedule_args": [
+                        {
+                            "type": "mt_transformer"
+                        }
+                    ]
+                },
+                {
+                    "type": "schedule_wd",
+		    "step_on": "batch",
+                    "schedule_args": [
+                        {
+                            "type": "mt_transformer"
+                        }
+                    ]
+                }
+            ]
+        }},
+    "train_metrics": [{"type": "fwbce",
+	             "pred_in": "loss"},
+		    {"type": "bce",
+		     "pred_in": "loss"},
+		    {"type": "fwdice",
+		     "epsilon": 1.0,
+		     "pred_in": "loss"},
+		    {"type": "auc_roc",
+		    "num_thresholds": 200,
+		    "pred_in": "global_pred",
+		    "n_coords": 12},
+    		    {"type": "mean_att",
+    		     "attention_in": "layer_0_block_tx",
+		     "num_heads": 8,
+		     "attention_shape": [12, 64]},
+		    {"type": "mean_att",
+		     "attention_in": "layer_0_block_ty",
+		     "num_heads": 8,
+		     "attention_shape": [12, 13]},
+    		    {"type": "mean_att",
+		     "attention_in": "layer_0_block_xx",
+		     "num_heads": 8,
+		     "attention_shape": [64, 64]}], 
+    "losses": [{"type": "bce",
+	      "pred_in": "loss",
+	      "weight": 1.0},
+    	     {"type": "fwdice",
+	      "epsilon": 1.0,
+	      "pred_in": "loss"}],
+    "eval_metrics": [{"type": "auc_roc",
+		    "num_thresholds": 200,
+		    "pred_in": "global_pred",
+		    "n_coords": 12},
+    		   {"type": "th_train",
+		    "threshold_step": 0.005,
+    		    "metric_names": ["f1score", "accuracy"],
+		    "pred_in": "global_pred",
+		    "n_coords": 12}, 
+    		   {"type": "th_abaw3_seq",
+		    "metric_names": ["f1score", "accuracy"],
+		   "pred_in": "global_pred"}],
+    "callbacks": [],
+    "log_folder": "ECCV_submission/abaw3_seq/ivit_motcat/bce"
+}

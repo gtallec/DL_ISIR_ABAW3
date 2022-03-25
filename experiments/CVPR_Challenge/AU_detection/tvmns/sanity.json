@@ -1,0 +1,100 @@
+{
+    "dataset": {
+        "name": "abaw3_video",
+        "size": [null, 112, 112, 3]
+    },
+    "dataset_statistics": {"train": ["occurences", "frequencies", "steps_by_epoch"]},
+    "storing": "CVPR_Challenge/AU_detection/tvmns/sanity.csv",
+    "data_processing": [{"type": "m_horizontal_flip"},
+    		      {"type": "m_rotation"},
+		      {"type": "m_zoom"},
+    		      {"type": "m_label_smoothing",
+		       "K": 2},
+    		      {"type": "m_brightness"},
+    		      {"type": "m_channel_drop"}],
+    "train_dataset": {
+        "name": "abaw3_video",
+	"sanity_subsample": 1000,
+	"aug_subsample": 1,
+	"mode": "train"},
+    "eval_dataset": {
+        "name": "abaw3_video",
+	"sanity_subsample": 1000,
+	"aug_subsample": 1,
+	"mode": "train"},
+    "model": {
+        "main": { 
+	    "type": "mencreg",
+	    "dependencies": ["encoder", "regressor"]},
+        "encoder": {
+            "type": "td_effb0",
+            "optimizer": "encoder",
+	    "weights": "imagenet"},
+    	"regressor": {
+		"type": "tvmns",
+		"optimizer": "regressor",
+		"T": 12}},	 
+    "optimizers": {
+	"encoder": {
+            "params": {
+                "type": "adam"
+            },
+            "schedules": [
+                {
+                    "type": "schedule_lr",
+		    "step_on": "epoch",
+                    "schedule_args": [
+                        {
+                            "type": "exponential"
+                        }
+                    ]
+                }
+	    ]
+        },
+        "regressor": {
+            "params": {
+                "type": "adam"
+            },
+            "schedules": [
+                {
+                    "type": "schedule_lr",
+		    "step_on": "epoch",
+                    "schedule_args": [
+                        {
+                            "type": "exponential"
+                        }
+                    ]
+                }]
+        }},
+    "train_metrics": [{"type": "mbce",
+	             "pred_in": "loss"},
+		    {"type": "m_auc_roc",
+		    "num_thresholds": 200,
+		    "pred_in": "global_pred",
+		    "n_coords": 12}], 
+    "losses": [{"type": "mbce",
+	      "pred_in": "loss",
+	      "weight": 1.0}],
+    "eval_metrics": [{"type": "m_auc_roc",
+		    "num_thresholds": 200,
+		    "pred_in": "global_pred",
+		    "n_coords": 12},
+		   {"type": "mbce",
+	             "pred_in": "loss"},
+    		   {"type": "m_th_train",
+		    "threshold_step": 0.005,
+    		    "metric_names": ["f1score", "accuracy"],
+		    "pred_in": "global_pred",
+		    "n_coords": 12}, 
+    		   {"type": "m_th_abaw3",
+		    "metric_names": ["f1score", "accuracy"],
+		   "pred_in": "global_pred"}],
+    "callbacks": [
+    	{
+    	   "type": "ckpt",
+    	   "ckpt_template": "{}-epoch",
+    	   "save_rate": 1
+	}
+    ],
+    "log_folder": "CVPR_Challenge/AU_detection/tvmns/sanity"
+}

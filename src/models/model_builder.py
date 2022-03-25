@@ -1,14 +1,10 @@
 from models.regressors.config import SUPPORTED_REGRESSORS
 from models.encoders.config import SUPPORTED_ENCODERS
-from models.vectors import SUPPORTED_VECTORS
 from models.skeletons import SUPPORTED_SKELETONS
-from models.controllers import Controllers
 
 SUPPORTED_MODELS = {**SUPPORTED_REGRESSORS,
                     **SUPPORTED_ENCODERS,
-                    **SUPPORTED_VECTORS,
-                    **SUPPORTED_SKELETONS,
-                    "controllers": Controllers}
+                    **SUPPORTED_SKELETONS}
 
 def model_block(model_args, name):
     model_type = model_args.pop('type')

@@ -3,8 +3,6 @@ import copy
 import sys
 import os
 
-import tensorflow as tf
-
 import pandas as pd
 import numpy as np
 
@@ -23,33 +21,9 @@ from configs.config import LOG_PATH, RESULT_PATH
 
 from optimizers import optimizer
 from callbacks.callback_builder import CallbackBuilder
-from format_list import get_format_list
 
 
 
-
-def unroll_formattable_dict(formattable_dict):
-    dictionary = copy.deepcopy(formattable_dict)
-    unrolled_dict = dict()
-    for key in dictionary:
-        key_dict = dictionary[key]
-        if 'formattable' in key_dict:
-            format_list = get_format_list(key_dict.pop('formattable'))
-            for format_element in format_list:
-                unrolled_key_dict = dict()
-                for nested_key in key_dict:
-                    current_dict = key_dict[nested_key]
-                    cp_dict = dict()
-                    for super_nested_key in current_dict:
-                        if current_dict[super_nested_key] == '{}':
-                            cp_dict[super_nested_key] = format_element
-                        else:
-                            cp_dict[super_nested_key] = current_dict[super_nested_key]
-                    unrolled_key_dict[nested_key + '_{}'.format(format_element)] = cp_dict
-                unrolled_dict[key.format(format_element)] = unrolled_key_dict
-        else:
-            unrolled_dict[key] = copy.deepcopy(key_dict)
-    return unrolled_dict
 
 
 class ExperimentParser:
@@ -312,7 +286,6 @@ class EvalExperimentParser(ExperimentParser):
             threshold_metric['thresholds'] = thresholds
 
 
-
 class MetaExperimentParser(ExperimentParser):
     """ Class that converts meta experiment_dictionary into keras/tf usable objects"""
 
@@ -333,11 +306,3 @@ class VisualExperimentParser(ExperimentParser):
     def __init__(self, experiment_dict):
         super(VisualExperimentParser, self).__init__(experiment_dict=experiment_dict,
                                                      supported_modes=[])
-   
-if __name__ == '__main__':
-    experiment_file = 'block_0.json'
-    with open(experiment_file) as json_file:
-        experiment_dict = json.load(json_file)
-
-    experiment_parser = EvalExperimentParser(experiment_dict)
-

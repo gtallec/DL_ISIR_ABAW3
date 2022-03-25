@@ -1,0 +1,149 @@
+{
+    "dataset": {
+        "name": "au_merge",
+        "size": [299, 299, 3]
+    },
+    "dataset_statistics": {"train": ["steps_by_epoch"]},
+    "storing": "CVPR_Challenge/AU_detection/au_merge/trainval_dice.csv",
+    "data_processing": [
+	    	      {"type": "horizontal_flip"},
+		      {"type": "brightness"},
+		      {"type": "channel_drop"},
+	    	      {"type": "rotation"},
+	    	      {"type": "zoom"},
+		      {"type": "pl_label_smoothing",
+		       "K": 2}],
+    "train_dataset": {
+        "name": "au_merge",
+	"mode": "trainval",
+	"abaw3_prop": 0.75,
+	"disfa_prop": 0.125,
+	"bp4d_prop": 0.125,
+	"subsample": 5},
+    "eval_dataset": {
+        "name": "au_merge",
+	"mode": "valid",
+	"abaw3_prop": 0.75,
+	"disfa_prop": 0.125,
+	"bp4d_prop": 0.125,
+	"subsample": 5},
+    "model": {
+        "main": { 
+	    "type": "hencreg",
+	    "dependencies": ["encoder", "transformer", "decoder"]},
+        "encoder": {
+            "type": "inceptionv3_encoder",
+            "optimizer": "encoder",
+	    "weights": "imagenet"},
+	"transformer": {
+	    "type": "ViT",
+	    "patch_size": 1,
+	    "optimizer": "transformer"},
+    	"decoder": {
+		"type": "ttat",
+		"optimizer": "decoder",
+		"T": 17}},	 
+    "optimizers": {
+	"encoder": {
+            "params": {
+                "type": "adamw"
+            },
+            "schedules": [
+                {
+                    "type": "schedule_lr",
+		    "step_on": "epoch",
+                    "schedule_args": [
+                        {
+                            "type": "exponential"
+                        }
+                    ]
+                },
+                {
+                    "type": "schedule_wd",
+		    "step_on": "epoch",
+                    "schedule_args": [
+                        {
+                            "type": "exponential"
+                        }
+                    ]
+                }
+	    ]
+        },
+        "transformer": {
+            "params": {
+                "type": "adamw"
+            },
+            "schedules": [
+                {
+                    "type": "schedule_lr",
+		    "step_on": "batch",
+                    "schedule_args": [
+                        {
+                            "type": "vit_transformer"
+                        }
+                    ]
+                },
+                {
+                    "type": "schedule_wd",
+		    "step_on": "batch",
+                    "schedule_args": [
+                        {
+                            "type": "vit_transformer"
+                        }
+                    ]
+                }
+	    ]
+        },
+        "decoder": {
+            "params": {
+                "type": "adamw"
+            },
+            "schedules": [
+                {
+                    "type": "schedule_lr",
+		    "step_on": "batch",
+                    "schedule_args": [
+                        {
+                            "type": "mt_transformer"
+                        }
+                    ]
+                },
+                {
+                    "type": "schedule_wd",
+		    "step_on": "batch",
+                    "schedule_args": [
+                        {
+                            "type": "mt_transformer"
+                        }
+                    ]
+                }
+            ]
+        }},
+    "train_metrics": [{"type": "plbce",
+	    	     "pred_in": "loss"},
+		    {"type": "pldice",
+		    "pred_in": "loss"},
+    		    {"type": "mean_att",
+    		     "attention_in": "layer_0_att_tx",
+		     "attention_shape": [17, 64]}, 
+    		    {"type": "mean_att",
+    		     "attention_in": "layer_0_att_tt",
+		     "attention_shape": [17, 17]}], 
+    "losses": [{"type": "plbce",
+	      "pred_in": "loss",
+	      "weight": 1.0},
+    	     {"type": "pldice",
+    	      "pred_in": "loss"}],
+    "eval_metrics": [{"type": "pl_th_train",
+		    "threshold_step": 0.005,
+    		    "metric_names": ["f1score", "accuracy"],
+		    "pred_in": "global_pred",
+		    "n_coords": 17}, 
+    		   {"type": "pl_th_abaw3",
+		    "metric_names": ["f1score", "accuracy"],
+		   "pred_in": "global_pred"},
+		   {"type": "plbce",
+		    "pred_in": "loss"}],
+    "callbacks": [],
+    "log_folder": "CVPR_Challenge/AU_detection/au_merge/trainval_dice"
+}
