@@ -1,0 +1,13 @@
+{"grid": {"shared_dense": [true],
+ "attention_mode": ["cross", "self"],
+ "controller_init": ["glorot_uniform"],
+ "num_layers": [2],
+ "d_model": [128],
+ "num_heads": [4],
+ "dff": [128],
+ "rate": [0.1],
+ "temp_yy": [1.0],
+ "temp_yx": [1.0],
+ "pred_mode": ["monte_carlo"],
+ "pred_N": [10]}}
+

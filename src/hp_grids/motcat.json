@@ -1,0 +1,16 @@
+{"grid": {"num_layers": [2],
+	"d_model": [128],
+	"num_heads": [8],
+	"dff": [512],
+	"rate": [0.1],
+	"num_patches": [64],
+	"temp_qk": [1.0],
+	"M": [1],
+	"ca_order": ["xy"],
+	"permutation_heuristic": ["with_identity"],
+	"permutation_encoding": [true],
+	"pred_mode": ["monte_carlo"],
+	"pred_N": [10]},
+ "constraints": {"qk": ["tx", "ty", "xx", "yy"]}} 
+	       
+

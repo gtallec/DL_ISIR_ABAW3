@@ -1,0 +1,19 @@
+{"grid": {"units": [64],
+        "T": [12],
+	"N_sample": [20],
+        "batchsize": [64],
+	"pooling": ["max"],
+        "epochs": [100],
+        "opt_var0_shared_schedule": [1e-4],
+        "opt_var0_decay_shared_schedule": [0.99],
+        "epsilon_shared_schedule": [1e-7],
+	"weight_fwdice": [0.5],
+	"ignore_mixup": [true],
+	"beta_mixup": [0.4],
+        "alpha_smooth": [0.0],
+        "rotation_factor": [0.1],
+        "zoom_factor": [0.1]},
+ "constraints": {"opt_var": ["lr", "wd"],
+               "shared_schedule": ["encoder", "regressor"]}} 
+	       
+

@@ -1,0 +1,19 @@
+{"grid": {"bottleneck": [512],
+	"pooling": ["avg"],
+        "T": [12],
+	"S": [4],
+	"units": [128],
+        "batchsize": [32],
+        "epochs": [50],
+        "opt_var0_shared_optim": [5e-4],
+	"opt_var0_decay_shared_optim": [0.99],
+        "epsilon_shared_optim": [1e-7],
+	"rotation_factor": [0.1],
+	"zoom_factor": [0.1],
+	"alpha_smooth": [0.1],
+	"brightness_factor": [0.1],
+	"p_channel": [0.1]},
+ "constraints": {"shared_optim": ["encoder", "regressor"], 
+               "opt_var": ["lr"]}} 
+	       
+
